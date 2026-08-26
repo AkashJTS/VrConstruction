@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Lato', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-exo {
+    font-family: 'Exo 2', sans-serif;
+  }
+}
+
+/* Custom HandyMan Accents & Animations */
+.bg-handyman-blue {
+  background-color: #448aff;
+}
+
+.text-handyman-blue {
+  color: #448aff;
+}
+
+.border-handyman-blue {
+  border-color: #448aff;
+}
+
+.bg-handyman-yellow {
+  background-color: #ffc107;
+}
+
+.text-handyman-yellow {
+  color: #ffc107;
+}
+
+.border-handyman-yellow {
+  border-color: #ffc107;
+}
+
+.title-stripe {
+  position: relative;
+  padding-left: 14px;
+}
+
+.title-stripe::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 4px;
+  background-color: #448aff;
+  border-radius: 2px;
+}
