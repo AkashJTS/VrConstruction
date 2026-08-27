@@ -1,68 +1,42 @@
 import React from 'react';
-import { Phone, ShieldCheck, Clock, Award, Facebook, Twitter, Linkedin, MessageCircle } from 'lucide-react';
+import { Facebook, Twitter, Linkedin, PhoneCall  } from 'lucide-react';
 
 export const TopBar: React.FC = () => {
   return (
-    <div id="top-bar" className="bg-[#448aff] text-white text-xs border-b border-[#3b7ae0]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row items-center justify-between min-h-[44px] py-1.5 sm:py-0 gap-2">
-          {/* Left Value Props */}
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 font-medium uppercase tracking-wider text-[11px] sm:text-xs">
-            <span className="flex items-center gap-1.5 text-blue-50">
-              <Clock className="w-3.5 h-3.5 text-amber-300" /> Quick Service.
-            </span>
-            <span className="hidden xs:inline text-blue-200">•</span>
-            <span className="flex items-center gap-1.5 text-blue-50">
-              <Award className="w-3.5 h-3.5 text-amber-300" /> Quality Work.
-            </span>
-            <span className="hidden xs:inline text-blue-200">•</span>
-            <span className="flex items-center gap-1.5 text-blue-50">
-              <ShieldCheck className="w-3.5 h-3.5 text-amber-300" /> Lifetime Support.
-            </span>
-          </div>
+    <div className="w-full bg-[#052615] text-white text-[11px] font-bold tracking-wider">
+      <div className="w-full px-5 flex items-center justify-between h-10">
 
-          {/* Right Hotline & Socials */}
-          <div className="flex items-center gap-4">
-            <a 
-              href="tel:+61123456789" 
-              className="flex items-center gap-1.5 text-blue-100 hover:text-white font-semibold transition-colors"
-            >
-              <Phone className="w-3.5 h-3.5 text-amber-300" />
-              <span>+61 (123) 456 789</span>
-            </a>
-            <div className="h-3 w-px bg-blue-300/40 hidden sm:block"></div>
-            <div className="flex items-center space-x-1.5">
-              <a 
-                href="#facebook" 
-                title="Facebook" 
-                className="w-7 h-7 flex items-center justify-center rounded-full bg-blue-600/40 hover:bg-blue-600 text-white transition-colors"
-              >
-                <Facebook className="w-3.5 h-3.5" />
-              </a>
-              <a 
-                href="#twitter" 
-                title="Twitter" 
-                className="w-7 h-7 flex items-center justify-center rounded-full bg-blue-600/40 hover:bg-blue-600 text-white transition-colors"
-              >
-                <Twitter className="w-3.5 h-3.5" />
-              </a>
-              <a 
-                href="#linkedin" 
-                title="LinkedIn" 
-                className="w-7 h-7 flex items-center justify-center rounded-full bg-blue-600/40 hover:bg-blue-600 text-white transition-colors"
-              >
-                <Linkedin className="w-3.5 h-3.5" />
-              </a>
-              <a 
-                href="#contact" 
-                title="Direct Inquiry" 
-                className="w-7 h-7 flex items-center justify-center rounded-full bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold transition-colors"
-              >
-                <MessageCircle className="w-3.5 h-3.5" />
-              </a>
-            </div>
-          </div>
+        {/* Left Text */}
+        <div className="flex items-center space-x-6 uppercase font-black">
+          <span>Built Right. </span>
+          <span>Built to Last.</span>
         </div>
+
+        {/* Right Social Links */}
+        <div className="flex items-center h-full border-r border-white/20">
+        <div className="hidden lg:flex items-center gap-4 mr-4 shrink-0">
+          <a
+            href="tel:+61123456789"
+            className="flex items-center gap-2 text-white hover:text-amber-400 transition-colors text-xs font-bold uppercase tracking-wider"
+          >
+            <PhoneCall className="w-4 h-4 text-[#facc15]" />
+            <span>+91 (123) 456 789</span>
+          </a>
+        </div>
+          <a href="#facebook" className="h-full px-3.5 flex items-center justify-center border-l border-white/20 hover:bg-emerald-900 transition-colors">
+            <Facebook className="w-3.5 h-3.5 fill-current" />
+          </a>
+          <a href="#twitter" className="h-full px-3.5 flex items-center justify-center border-l border-white/20 hover:bg-emerald-900 transition-colors">
+            <Twitter className="w-3.5 h-3.5 fill-current" />
+          </a>
+          <a href="#linkedin" className="h-full px-3.5 flex items-center justify-center border-l border-white/20 hover:bg-emerald-900 transition-colors">
+            <Linkedin className="w-3.5 h-3.5 fill-current" />
+          </a>
+          <a href="#tumblr" className="h-full px-3.5 flex items-center justify-center border-l border-white/20 hover:bg-emerald-900 transition-colors font-serif text-xs lowercase">
+            t
+          </a>
+        </div>
+
       </div>
     </div>
   );
