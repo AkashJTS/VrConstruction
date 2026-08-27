@@ -1,4 +1,4 @@
-
+import React, { useState } from "react";
 import {
   PhoneCall,
   MapPin,
@@ -7,9 +7,8 @@ import {
   Clock,
   CheckCircle2,
   ExternalLink,
-} from 'lucide-react';
-import { NavSection, ServiceRequest } from '../types';
-import { useState } from 'react';
+} from "lucide-react";
+import { NavSection, ServiceRequest } from "../types";
 
 interface ContactProps {
   onNavigate: (section: NavSection) => void;
@@ -21,20 +20,22 @@ export const Contact: React.FC<ContactProps> = ({
   prefilledService,
 }) => {
   const [formData, setFormData] = useState<ServiceRequest>({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    serviceType: prefilledService || 'HandyMan Repairs',
-    preferredDate: '',
-    preferredTime: 'Morning (8AM - 12PM)',
-    urgency: 'routine',
-    message: '',
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    serviceType: prefilledService || "HandyMan Repairs",
+    preferredDate: "",
+    preferredTime: "Morning (8AM - 12PM)",
+    urgency: "routine",
+    message: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [bookingConfirmation, setBookingConfirmation] =
-    useState<string | null>(null);
+
+  const [bookingConfirmation, setBookingConfirmation] = useState<
+    string | null
+  >(null);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -55,36 +56,43 @@ export const Contact: React.FC<ContactProps> = ({
   };
 
   return (
-    <section id="contact" className="w-full overflow-hidden bg-[#084928] text-white">
+    <section
+      id="contact"
+      className="w-full bg-[#084928] text-white overflow-hidden"
+    >
       {/* ============================================================
-          CONTACT BANNER — SAME AS VIDEO
+          CONTACT PAGE BANNER
+          EXACT MATCH TO ABOUT / SERVICES PARALLAX STYLE
           ============================================================ */}
-      <div
-        className="relative flex h-[285px] items-center justify-center bg-cover bg-center"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)),url('/images/about-banner.jpg')",
-        }}
-      >
-        <div className="absolute left-0 right-0 top-0 h-[3px] bg-[#D9AE00]" />
+      <section className="relative flex h-[260px] items-center justify-center overflow-hidden border-y border-[#D9AE00]/30 text-center sm:h-[310px]">
+        <div
+          className="absolute inset-0 z-0 bg-repeat [clip-path:inset(0)]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(8, 73, 40, 0.75), rgba(8, 73, 40, 0.75)), url('/sub-bnr-bg.jpg')",
+            backgroundSize: "auto",
+            backgroundAttachment: "fixed",
+          }}
+        />
 
-        <div className="relative z-10 mt-4 text-center">
-          <h1 className="font-exo text-4xl font-black uppercase text-white sm:text-5xl">
+        <div className="relative z-10">
+          <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-white drop-shadow-md font-exo">
             Contact
           </h1>
 
-          <p className="mt-3 font-exo text-xs font-bold uppercase text-white sm:text-sm">
+          <p className="mt-2 text-xs font-bold uppercase tracking-wider text-[#D9AE00] drop-shadow-md font-exo">
             We Have 25 Years Experience In Plumbing
           </p>
         </div>
-      </div>
+      </section>
 
       {/* ============================================================
-          THREE CONTACT BOXES — SAME VIDEO ORDER
+          THREE CONTACT BOXES
           ============================================================ */}
-      <div className="bg-[#084928] py-10 sm:py-14">
+      <div className="relative z-10 bg-[#084928] py-10 sm:py-14">
         <div className="mx-auto max-w-[1180px] px-5 sm:px-8">
           <div className="grid grid-cols-1 border border-white/10 bg-[#062D1A] md:grid-cols-3">
+
             {/* CALL */}
             <div className="flex min-h-[210px] flex-col items-center justify-center border-b border-white/10 px-6 text-center md:border-b-0 md:border-r">
               <PhoneCall className="h-7 w-7 text-[#D9AE00]" />
@@ -151,7 +159,7 @@ export const Contact: React.FC<ContactProps> = ({
                 onClick={() =>
                   setFormData({
                     ...formData,
-                    serviceType: 'Tankless Water Heaters ($25 Promo)',
+                    serviceType: "Tankless Water Heaters ($25 Promo)",
                   })
                 }
                 className="mt-4 border border-[#D9AE00] bg-transparent px-5 py-2.5 text-[10px] font-bold uppercase text-white hover:bg-[#D9AE00] hover:text-[#084928]"
@@ -164,10 +172,11 @@ export const Contact: React.FC<ContactProps> = ({
       </div>
 
       {/* ============================================================
-          REQUEST SERVICE FORM — SAME VIDEO LAYOUT
+          REQUEST SERVICE FORM
           ============================================================ */}
-      <div className="bg-[#084928] py-12 sm:py-16">
+      <div className="relative z-10 bg-[#084928] py-12 sm:py-16">
         <div className="mx-auto max-w-[950px] px-5 sm:px-8">
+
           <div className="mb-8 text-center">
             <h2 className="font-exo text-2xl font-black uppercase text-white sm:text-3xl">
               Request Service or Estimate
@@ -181,6 +190,7 @@ export const Contact: React.FC<ContactProps> = ({
 
           {bookingConfirmation ? (
             <div className="border border-[#D9AE00] bg-[#062D1A] p-8 text-center">
+
               <CheckCircle2 className="mx-auto h-12 w-12 text-[#D9AE00]" />
 
               <p className="mt-4 text-xs font-bold uppercase tracking-widest text-[#D9AE00]">
@@ -193,7 +203,7 @@ export const Contact: React.FC<ContactProps> = ({
 
               <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-white/65">
                 Thank you, <strong>{formData.name}</strong>! Your service
-                request has been logged. A technician will contact you at{' '}
+                request has been logged. A technician will contact you at{" "}
                 <strong>{formData.phone}</strong>.
               </p>
 
@@ -201,16 +211,17 @@ export const Contact: React.FC<ContactProps> = ({
                 type="button"
                 onClick={() => {
                   setBookingConfirmation(null);
+
                   setFormData({
-                    name: '',
-                    email: '',
-                    phone: '',
-                    address: '',
-                    serviceType: 'HandyMan Repairs',
-                    preferredDate: '',
-                    preferredTime: 'Morning (8AM - 12PM)',
-                    urgency: 'routine',
-                    message: '',
+                    name: "",
+                    email: "",
+                    phone: "",
+                    address: "",
+                    serviceType: "HandyMan Repairs",
+                    preferredDate: "",
+                    preferredTime: "Morning (8AM - 12PM)",
+                    urgency: "routine",
+                    message: "",
                   });
                 }}
                 className="mt-6 border border-[#D9AE00] bg-[#D9AE00] px-6 py-3 text-xs font-bold uppercase text-[#084928] hover:bg-[#084928] hover:text-[#D9AE00]"
@@ -224,6 +235,8 @@ export const Contact: React.FC<ContactProps> = ({
               className="border border-white/10 bg-[#062D1A] p-6 sm:p-9"
             >
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+
+                {/* NAME */}
                 <div>
                   <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
                     Your Name *
@@ -244,6 +257,7 @@ export const Contact: React.FC<ContactProps> = ({
                   />
                 </div>
 
+                {/* EMAIL */}
                 <div>
                   <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
                     Email Address *
@@ -264,6 +278,7 @@ export const Contact: React.FC<ContactProps> = ({
                   />
                 </div>
 
+                {/* PHONE */}
                 <div>
                   <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
                     Phone Number *
@@ -284,6 +299,7 @@ export const Contact: React.FC<ContactProps> = ({
                   />
                 </div>
 
+                {/* ADDRESS */}
                 <div>
                   <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
                     Full Service Address
@@ -304,7 +320,10 @@ export const Contact: React.FC<ContactProps> = ({
                 </div>
               </div>
 
+              {/* SERVICE / DATE / URGENCY */}
               <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
+
+                {/* SERVICE */}
                 <div>
                   <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
                     Service Required
@@ -332,6 +351,7 @@ export const Contact: React.FC<ContactProps> = ({
                   </select>
                 </div>
 
+                {/* DATE */}
                 <div>
                   <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
                     Preferred Date
@@ -350,6 +370,7 @@ export const Contact: React.FC<ContactProps> = ({
                   />
                 </div>
 
+                {/* URGENCY */}
                 <div>
                   <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
                     Urgency Level
@@ -360,13 +381,20 @@ export const Contact: React.FC<ContactProps> = ({
                     onChange={(event) =>
                       setFormData({
                         ...formData,
-                        urgency: event.target.value as ServiceRequest['urgency'],
+                        urgency:
+                          event.target.value as ServiceRequest["urgency"],
                       })
                     }
                     className="w-full border border-white/10 bg-[#084928] px-3 py-3 text-xs text-white outline-none focus:border-[#D9AE00]"
                   >
-                    <option value="routine">Routine (Next 2-3 days)</option>
-                    <option value="urgent">Urgent (Today / Tomorrow)</option>
+                    <option value="routine">
+                      Routine (Next 2-3 days)
+                    </option>
+
+                    <option value="urgent">
+                      Urgent (Today / Tomorrow)
+                    </option>
+
                     <option value="emergency">
                       24/7 Active Emergency (Immediate)
                     </option>
@@ -374,6 +402,7 @@ export const Contact: React.FC<ContactProps> = ({
                 </div>
               </div>
 
+              {/* MESSAGE */}
               <div className="mt-5">
                 <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
                   Description of work or services needed
@@ -393,6 +422,7 @@ export const Contact: React.FC<ContactProps> = ({
                 />
               </div>
 
+              {/* SUBMIT */}
               <div className="mt-6 text-left">
                 <button
                   type="submit"
@@ -400,7 +430,10 @@ export const Contact: React.FC<ContactProps> = ({
                   className="inline-flex items-center gap-2 border border-[#D9AE00] bg-[#D9AE00] px-7 py-3 text-xs font-bold uppercase text-[#084928] hover:bg-[#084928] hover:text-[#D9AE00] disabled:opacity-60"
                 >
                   <Send className="h-4 w-4" />
-                  {isSubmitting ? 'Processing Request...' : 'Send Request'}
+
+                  {isSubmitting
+                    ? "Processing Request..."
+                    : "Send Request"}
                 </button>
               </div>
             </form>
@@ -409,13 +442,14 @@ export const Contact: React.FC<ContactProps> = ({
       </div>
 
       {/* ============================================================
-          GOOGLE MAPS — AFTER CONTACT FORM
+          GOOGLE MAPS
           ============================================================ */}
       <section
         id="map"
-        className="relative overflow-hidden border-t border-white/10 bg-[#062D1A]"
+        className="relative z-10 overflow-hidden border-t border-white/10 bg-[#062D1A]"
       >
         <div className="relative h-[420px] w-full">
+
           <iframe
             title="HandyMan Melbourne Location"
             src="https://www.google.com/maps?q=121%20King%20St%2C%20Melbourne%20VIC%203000&output=embed"
@@ -425,14 +459,16 @@ export const Contact: React.FC<ContactProps> = ({
             allowFullScreen
           />
 
-          {/* Map information card */}
           <div className="absolute left-5 top-5 z-10 w-[calc(100%-40px)] max-w-[360px] border border-[#D9AE00] bg-[#062D1A]/95 p-6 shadow-2xl backdrop-blur-sm sm:left-8 sm:top-8">
+
             <div className="flex items-start gap-4">
+
               <div className="flex h-11 w-11 shrink-0 items-center justify-center bg-[#D9AE00] text-[#084928]">
                 <MapPin className="h-5 w-5" />
               </div>
 
               <div className="min-w-0">
+
                 <p className="font-exo text-[10px] font-black uppercase tracking-[0.18em] text-[#D9AE00]">
                   Our Location
                 </p>
@@ -444,11 +480,14 @@ export const Contact: React.FC<ContactProps> = ({
                 <p className="mt-2 text-xs leading-6 text-white/70">
                   121 King St, Melbourne VIC 3000
                 </p>
+
               </div>
             </div>
 
             <div className="mt-5 border-t border-white/10 pt-4">
+
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
                 <span className="flex items-center gap-2 text-xs font-bold uppercase text-[#D9AE00]">
                   <Clock className="h-4 w-4" />
                   Open 24/7
@@ -463,6 +502,7 @@ export const Contact: React.FC<ContactProps> = ({
                   Open in Google Maps
                   <ExternalLink className="h-3.5 w-3.5" />
                 </a>
+
               </div>
             </div>
           </div>
