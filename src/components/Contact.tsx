@@ -5,10 +5,11 @@ import {
   Tag,
   Send,
   Clock,
-  CheckCircle2,
   ExternalLink,
   ChevronDown,
   Check,
+  CheckCircle2,
+  X,
 } from "lucide-react";
 import { NavSection, ServiceRequest } from "../types";
 
@@ -74,7 +75,7 @@ export const Contact: React.FC<ContactProps> = ({
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [bookingConfirmation, setBookingConfirmation] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -97,21 +98,30 @@ export const Contact: React.FC<ContactProps> = ({
 
     setIsSubmitting(true);
 
+    // Simulated network submit request delay
     setTimeout(() => {
       setIsSubmitting(false);
+      setShowModal(true);
 
-      const referenceId = `HM-${Math.floor(
-        100000 + Math.random() * 900000
-      )}`;
-
-      setBookingConfirmation(referenceId);
-    }, 900);
+      // Reset form values after submission
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        address: "",
+        serviceType: "RESIDENTIAL",
+        preferredDate: "",
+        preferredTime: "Morning (8AM - 12PM)",
+        urgency: "routine",
+        message: "",
+      });
+    }, 1000);
   };
 
   return (
     <section
       id="contact"
-      className="w-full bg-[#084928] text-white overflow-hidden"
+      className="relative w-full bg-[#084928] text-white overflow-hidden"
     >
       {/* ============================================================
           CONTACT PAGE BANNER
@@ -133,7 +143,7 @@ export const Contact: React.FC<ContactProps> = ({
           </h1>
 
           <p className="mt-2 text-xs font-bold uppercase tracking-wider text-[#D9AE00] drop-shadow-md font-exo">
-            We Have 25 Years Experience In Plumbing & Construction
+            We Have 25 Years Experience In Plumbing &amp; Construction
           </p>
         </div>
       </section>
@@ -144,7 +154,6 @@ export const Contact: React.FC<ContactProps> = ({
       <div className="relative z-10 bg-[#084928] py-10 sm:py-14">
         <div className="mx-auto max-w-[1180px] px-5 sm:px-8">
           <div className="grid grid-cols-1 border border-white/10 bg-[#062D1A] md:grid-cols-3">
-
             {/* CALL */}
             <div className="flex min-h-[210px] flex-col items-center justify-center border-b border-white/10 px-6 text-center md:border-b-0 md:border-r">
               <PhoneCall className="h-7 w-7 text-[#D9AE00]" />
@@ -228,7 +237,6 @@ export const Contact: React.FC<ContactProps> = ({
           ============================================================ */}
       <div className="relative z-10 bg-[#084928] py-12 sm:py-16">
         <div className="mx-auto max-w-[950px] px-5 sm:px-8">
-
           <div className="mb-8 text-center">
             <h2 className="font-exo text-2xl font-black uppercase text-white sm:text-3xl">
               Request Service or Estimate
@@ -240,289 +248,283 @@ export const Contact: React.FC<ContactProps> = ({
             </p>
           </div>
 
-          {bookingConfirmation ? (
-            <div className="border border-[#D9AE00] bg-[#062D1A] p-8 text-center">
-              <CheckCircle2 className="mx-auto h-12 w-12 text-[#D9AE00]" />
-
-              <p className="mt-4 text-xs font-bold uppercase tracking-widest text-[#D9AE00]">
-                Booking Reference ID
-              </p>
-
-              <h3 className="mt-2 font-exo text-2xl font-black text-white">
-                {bookingConfirmation}
-              </h3>
-
-              <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-white/65">
-                Thank you, <strong>{formData.name}</strong>! Your service
-                request has been logged. A technician will contact you at{" "}
-                <strong>{formData.phone}</strong>.
-              </p>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setBookingConfirmation(null);
-                  setFormData({
-                    name: "",
-                    email: "",
-                    phone: "",
-                    address: "",
-                    serviceType: "RESIDENTIAL",
-                    preferredDate: "",
-                    preferredTime: "Morning (8AM - 12PM)",
-                    urgency: "routine",
-                    message: "",
-                  });
-                }}
-                className="mt-6 border border-[#D9AE00] bg-[#D9AE00] px-6 py-3 text-xs font-bold uppercase text-[#084928] hover:bg-[#084928] hover:text-[#D9AE00]"
-              >
-                Submit Another Ticket
-              </button>
-            </div>
-          ) : (
-            <form
-              onSubmit={handleSubmit}
-              className="border border-white/10 bg-[#062D1A] p-6 sm:p-9"
-            >
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-
-                {/* NAME */}
-                <div>
-                  <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
-                    Your Name *
-                  </label>
-
-                  <input
-                    type="text"
-                    required
-                    placeholder="Full name"
-                    value={formData.name}
-                    onChange={(event) =>
-                      setFormData({
-                        ...formData,
-                        name: event.target.value,
-                      })
-                    }
-                    className="w-full border border-white/10 bg-[#084928] px-4 py-3 text-xs text-white outline-none placeholder:text-white/30 focus:border-[#D9AE00]"
-                  />
-                </div>
-
-                {/* EMAIL */}
-                <div>
-                  <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
-                    Email Address *
-                  </label>
-
-                  <input
-                    type="email"
-                    required
-                    placeholder="email@example.com"
-                    value={formData.email}
-                    onChange={(event) =>
-                      setFormData({
-                        ...formData,
-                        email: event.target.value,
-                      })
-                    }
-                    className="w-full border border-white/10 bg-[#084928] px-4 py-3 text-xs text-white outline-none placeholder:text-white/30 focus:border-[#D9AE00]"
-                  />
-                </div>
-
-                {/* PHONE */}
-                <div>
-                  <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
-                    Phone Number *
-                  </label>
-
-                  <input
-                    type="tel"
-                    required
-                    placeholder="+61 400 000 000"
-                    value={formData.phone}
-                    onChange={(event) =>
-                      setFormData({
-                        ...formData,
-                        phone: event.target.value,
-                      })
-                    }
-                    className="w-full border border-white/10 bg-[#084928] px-4 py-3 text-xs text-white outline-none placeholder:text-white/30 focus:border-[#D9AE00]"
-                  />
-                </div>
-
-                {/* ADDRESS */}
-                <div>
-                  <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
-                    Full Service Address
-                  </label>
-
-                  <input
-                    type="text"
-                    placeholder="Street address & suburb, Melbourne"
-                    value={formData.address}
-                    onChange={(event) =>
-                      setFormData({
-                        ...formData,
-                        address: event.target.value,
-                      })
-                    }
-                    className="w-full border border-white/10 bg-[#084928] px-4 py-3 text-xs text-white outline-none placeholder:text-white/30 focus:border-[#D9AE00]"
-                  />
-                </div>
-              </div>
-
-              {/* SERVICE / DATE / URGENCY */}
-              <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
-
-                {/* CUSTOM GROUPED SERVICE DROPDOWN */}
-                <div className="relative" ref={dropdownRef}>
-                  <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
-                    Service Required *
-                  </label>
-
-                  <button
-                    type="button"
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="flex w-full items-center justify-between border border-white/10 bg-[#084928] px-4 py-3 text-left text-xs text-white outline-none focus:border-[#D9AE00]"
-                  >
-                    <span className="truncate pr-2">
-                      {formData.serviceType || "Select a service..."}
-                    </span>
-                    <ChevronDown
-                      className={`h-4 w-4 shrink-0 text-[#D9AE00] transition-transform duration-200 ${
-                        isDropdownOpen ? "rotate-180" : ""
-                      }`}
-                    />
-                  </button>
-
-                  {/* Dropdown Menu */}
-                  {isDropdownOpen && (
-                    <div className="absolute left-0 top-full z-50 mt-1 max-h-72 w-full overflow-y-auto border border-[#D9AE00]/40 bg-[#042012] p-2 shadow-2xl backdrop-blur-md">
-                      {SERVICE_GROUPS.map((group) => (
-                        <div key={group.category} className="mb-3 last:mb-0">
-                          {/* Group Heading */}
-                          <div className="sticky top-0 bg-[#042012] px-2 py-1 text-[10px] font-black uppercase tracking-widest text-[#D9AE00] border-b border-[#D9AE00]/20">
-                            {group.category}
-                          </div>
-
-                          {/* Sub Options */}
-                          <div className="mt-1 space-y-0.5">
-                            {group.services.map((service) => {
-                              const isSelected = formData.serviceType === service;
-                              return (
-                                <button
-                                  key={service}
-                                  type="button"
-                                  onClick={() => {
-                                    setFormData({ ...formData, serviceType: service });
-                                    setIsDropdownOpen(false);
-                                  }}
-                                  className={`flex w-full items-center justify-between px-3 py-2 text-left text-xs transition-colors ${
-                                    isSelected
-                                      ? "bg-[#D9AE00] font-bold text-[#084928]"
-                                      : "text-white/80 hover:bg-white/10 hover:text-white"
-                                  }`}
-                                >
-                                  <span>{service}</span>
-                                  {isSelected && <Check className="h-3.5 w-3.5 text-[#084928]" />}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* DATE */}
-                <div>
-                  <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
-                    Preferred Date
-                  </label>
-
-                  <input
-                    type="date"
-                    value={formData.preferredDate}
-                    onChange={(event) =>
-                      setFormData({
-                        ...formData,
-                        preferredDate: event.target.value,
-                      })
-                    }
-                    className="w-full border border-white/10 bg-[#084928] px-3 py-3 text-xs text-white outline-none focus:border-[#D9AE00]"
-                  />
-                </div>
-
-                {/* URGENCY */}
-                <div>
-                  <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
-                    Urgency Level
-                  </label>
-
-                  <select
-                    value={formData.urgency}
-                    onChange={(event) =>
-                      setFormData({
-                        ...formData,
-                        urgency:
-                          event.target.value as ServiceRequest["urgency"],
-                      })
-                    }
-                    className="w-full border border-white/10 bg-[#084928] px-3 py-3 text-xs text-white outline-none focus:border-[#D9AE00]"
-                  >
-                    <option value="routine">
-                      Routine (Next 2-3 days)
-                    </option>
-
-                    <option value="urgent">
-                      Urgent (Today / Tomorrow)
-                    </option>
-
-                    <option value="emergency">
-                      24/7 Active Emergency (Immediate)
-                    </option>
-                  </select>
-                </div>
-              </div>
-
-              {/* MESSAGE */}
-              <div className="mt-5">
+          <form
+            onSubmit={handleSubmit}
+            className="border border-white/10 bg-[#062D1A] p-6 sm:p-9"
+          >
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              {/* NAME */}
+              <div>
                 <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
-                  Description of work or services needed
+                  Your Name *
                 </label>
 
-                <textarea
-                  rows={5}
-                  placeholder="Provide any details about the work, dimensions, material preferences, or specific requirements..."
-                  value={formData.message}
+                <input
+                  type="text"
+                  required
+                  placeholder="Full name"
+                  value={formData.name}
                   onChange={(event) =>
                     setFormData({
                       ...formData,
-                      message: event.target.value,
+                      name: event.target.value,
                     })
                   }
-                  className="w-full resize-none border border-white/10 bg-[#084928] p-3 text-xs text-white outline-none placeholder:text-white/30 focus:border-[#D9AE00]"
+                  className="w-full border border-white/10 bg-[#084928] px-4 py-3 text-xs text-white outline-none placeholder:text-white/30 focus:border-[#D9AE00]"
                 />
               </div>
 
-              {/* SUBMIT */}
-              <div className="mt-6 text-left">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="inline-flex items-center gap-2 border border-[#D9AE00] bg-[#D9AE00] px-7 py-3 text-xs font-bold uppercase text-[#084928] hover:bg-[#084928] hover:text-[#D9AE00] disabled:opacity-60"
-                >
-                  <Send className="h-4 w-4" />
+              {/* EMAIL */}
+              <div>
+                <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
+                  Email Address *
+                </label>
 
-                  {isSubmitting
-                    ? "Processing Request..."
-                    : "Send Request"}
-                </button>
+                <input
+                  type="email"
+                  required
+                  placeholder="email@example.com"
+                  value={formData.email}
+                  onChange={(event) =>
+                    setFormData({
+                      ...formData,
+                      email: event.target.value,
+                    })
+                  }
+                  className="w-full border border-white/10 bg-[#084928] px-4 py-3 text-xs text-white outline-none placeholder:text-white/30 focus:border-[#D9AE00]"
+                />
               </div>
-            </form>
-          )}
+
+              {/* PHONE */}
+              <div>
+                <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
+                  Phone Number *
+                </label>
+
+                <input
+                  type="tel"
+                  required
+                  placeholder="+61 400 000 000"
+                  value={formData.phone}
+                  onChange={(event) =>
+                    setFormData({
+                      ...formData,
+                      phone: event.target.value,
+                    })
+                  }
+                  className="w-full border border-white/10 bg-[#084928] px-4 py-3 text-xs text-white outline-none placeholder:text-white/30 focus:border-[#D9AE00]"
+                />
+              </div>
+
+              {/* ADDRESS */}
+              <div>
+                <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
+                  Full Service Address
+                </label>
+
+                <input
+                  type="text"
+                  placeholder="Street address & suburb, Melbourne"
+                  value={formData.address}
+                  onChange={(event) =>
+                    setFormData({
+                      ...formData,
+                      address: event.target.value,
+                    })
+                  }
+                  className="w-full border border-white/10 bg-[#084928] px-4 py-3 text-xs text-white outline-none placeholder:text-white/30 focus:border-[#D9AE00]"
+                />
+              </div>
+            </div>
+
+            {/* SERVICE / DATE / URGENCY */}
+            <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
+              {/* CUSTOM GROUPED SERVICE DROPDOWN */}
+              <div className="relative" ref={dropdownRef}>
+                <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
+                  Service Required *
+                </label>
+
+                <button
+                  type="button"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="flex w-full items-center justify-between border border-white/10 bg-[#084928] px-4 py-3 text-left text-xs text-white outline-none focus:border-[#D9AE00]"
+                >
+                  <span className="truncate pr-2">
+                    {formData.serviceType || "Select a service..."}
+                  </span>
+                  <ChevronDown
+                    className={`h-4 w-4 shrink-0 text-[#D9AE00] transition-transform duration-200 ${
+                      isDropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {/* Dropdown Menu */}
+                {isDropdownOpen && (
+                  <div className="absolute left-0 top-full z-50 mt-1 max-h-72 w-full overflow-y-auto border border-[#D9AE00]/40 bg-[#042012] p-2 shadow-2xl backdrop-blur-md">
+                    {SERVICE_GROUPS.map((group) => (
+                      <div key={group.category} className="mb-3 last:mb-0">
+                        {/* Group Heading */}
+                        <div className="sticky top-0 bg-[#042012] px-2 py-1 text-[10px] font-black uppercase tracking-widest text-[#D9AE00] border-b border-[#D9AE00]/20">
+                          {group.category}
+                        </div>
+
+                        {/* Sub Options */}
+                        <div className="mt-1 space-y-0.5">
+                          {group.services.map((service) => {
+                            const isSelected = formData.serviceType === service;
+                            return (
+                              <button
+                                key={service}
+                                type="button"
+                                onClick={() => {
+                                  setFormData({ ...formData, serviceType: service });
+                                  setIsDropdownOpen(false);
+                                }}
+                                className={`flex w-full items-center justify-between px-3 py-2 text-left text-xs transition-colors ${
+                                  isSelected
+                                    ? "bg-[#D9AE00] font-bold text-[#084928]"
+                                    : "text-white/80 hover:bg-white/10 hover:text-white"
+                                }`}
+                              >
+                                <span>{service}</span>
+                                {isSelected && <Check className="h-3.5 w-3.5 text-[#084928]" />}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* DATE */}
+              <div>
+                <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
+                  Preferred Date
+                </label>
+
+                <input
+                  type="date"
+                  value={formData.preferredDate}
+                  onChange={(event) =>
+                    setFormData({
+                      ...formData,
+                      preferredDate: event.target.value,
+                    })
+                  }
+                  className="w-full border border-white/10 bg-[#084928] px-3 py-3 text-xs text-white outline-none focus:border-[#D9AE00]"
+                />
+              </div>
+
+              {/* URGENCY */}
+              <div>
+                <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
+                  Urgency Level
+                </label>
+
+                <select
+                  value={formData.urgency}
+                  onChange={(event) =>
+                    setFormData({
+                      ...formData,
+                      urgency:
+                        event.target.value as ServiceRequest["urgency"],
+                    })
+                  }
+                  className="w-full border border-white/10 bg-[#084928] px-3 py-3 text-xs text-white outline-none focus:border-[#D9AE00]"
+                >
+                  <option value="routine">
+                    Routine (Next 2-3 days)
+                  </option>
+
+                  <option value="urgent">
+                    Urgent (Today / Tomorrow)
+                  </option>
+
+                  <option value="emergency">
+                    24/7 Active Emergency (Immediate)
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            {/* MESSAGE */}
+            <div className="mt-5">
+              <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
+                Description of work or services needed
+              </label>
+
+              <textarea
+                rows={5}
+                placeholder="Provide any details about the work, dimensions, material preferences, or specific requirements..."
+                value={formData.message}
+                onChange={(event) =>
+                  setFormData({
+                    ...formData,
+                    message: event.target.value,
+                  })
+                }
+                className="w-full resize-none border border-white/10 bg-[#084928] p-3 text-xs text-white outline-none placeholder:text-white/30 focus:border-[#D9AE00]"
+              />
+            </div>
+
+            {/* SUBMIT */}
+            <div className="mt-6 text-left">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="inline-flex items-center gap-2 border border-[#D9AE00] bg-[#D9AE00] px-7 py-3 text-xs font-bold uppercase text-[#084928] hover:bg-[#084928] hover:text-[#D9AE00] disabled:opacity-60 transition-colors"
+              >
+                <Send className="h-4 w-4" />
+
+                {isSubmitting
+                  ? "Processing Request..."
+                  : "Send Request"}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
+
+      {/* ============================================================
+          CONFIRMATION MODAL
+          ============================================================ */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md border border-[#D9AE00] bg-[#062D1A] p-8 text-center shadow-2xl">
+            <button
+              type="button"
+              onClick={() => setShowModal(false)}
+              className="absolute right-4 top-4 text-white/60 hover:text-white"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#D9AE00]/10 border border-[#D9AE00]">
+              <CheckCircle2 className="h-10 w-10 text-[#D9AE00]" />
+            </div>
+
+            <h3 className="mt-6 font-exo text-2xl font-black uppercase tracking-tight text-white">
+              Thanks for contacting us!
+            </h3>
+
+            <p className="mt-3 text-xs leading-6 text-white/80">
+              Our team will call you soon. Thank you!
+            </p>
+
+            <button
+              type="button"
+              onClick={() => setShowModal(false)}
+              className="mt-6 inline-block w-full border border-[#D9AE00] bg-[#D9AE00] px-6 py-3 text-xs font-bold uppercase text-[#084928] hover:bg-[#084928] hover:text-[#D9AE00] transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ============================================================
           GOOGLE MAPS
