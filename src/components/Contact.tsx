@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   PhoneCall,
   MapPin,
@@ -7,6 +7,8 @@ import {
   Clock,
   CheckCircle2,
   ExternalLink,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 import { NavSection, ServiceRequest } from "../types";
 
@@ -14,6 +16,46 @@ interface ContactProps {
   onNavigate: (section: NavSection) => void;
   prefilledService?: string;
 }
+
+// Service hierarchy data structure
+const SERVICE_GROUPS = [
+  {
+    category: "CONSTRUCTION",
+    services: ["RESIDENTIAL", "COMMERCIAL", "Warehouse"],
+  },
+  {
+    category: "RENOVATION",
+    services: ["All Types of Renovation Work"],
+  },
+  {
+    category: "OTHER SERVICES",
+    services: [
+      "ELECTRICAL",
+      "PLUMBING",
+      "TILES LAYING - Marble",
+      "TILES LAYING - Granite",
+      "CARPENTRY WORKS",
+      "FABRICATION - M.S",
+      "FABRICATION - S.S",
+      "FABRICATION - Aluminium",
+      "FALSE CEILING",
+      "PAINTING - INTERIOR",
+      "PAINTING - EXTERIOR",
+    ],
+  },
+  {
+    category: "INTERIOR WORK",
+    services: [
+      "KITCHEN",
+      "WALL UNIT",
+      "WARDROBES & LOFT",
+      "T.V CABINET",
+      "POOJA CABINET",
+      "WALL PANELING",
+      "Waterproofing",
+    ],
+  },
+];
 
 export const Contact: React.FC<ContactProps> = ({
   onNavigate,
@@ -24,7 +66,7 @@ export const Contact: React.FC<ContactProps> = ({
     email: "",
     phone: "",
     address: "",
-    serviceType: prefilledService || "HandyMan Repairs",
+    serviceType: prefilledService || "RESIDENTIAL",
     preferredDate: "",
     preferredTime: "Morning (8AM - 12PM)",
     urgency: "routine",
@@ -32,10 +74,21 @@ export const Contact: React.FC<ContactProps> = ({
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [bookingConfirmation, setBookingConfirmation] = useState<string | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const [bookingConfirmation, setBookingConfirmation] = useState<
-    string | null
-  >(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -62,7 +115,6 @@ export const Contact: React.FC<ContactProps> = ({
     >
       {/* ============================================================
           CONTACT PAGE BANNER
-          EXACT MATCH TO ABOUT / SERVICES PARALLAX STYLE
           ============================================================ */}
       <section className="relative flex h-[260px] items-center justify-center overflow-hidden border-y border-[#D9AE00]/30 text-center sm:h-[310px]">
         <div
@@ -81,7 +133,7 @@ export const Contact: React.FC<ContactProps> = ({
           </h1>
 
           <p className="mt-2 text-xs font-bold uppercase tracking-wider text-[#D9AE00] drop-shadow-md font-exo">
-            We Have 25 Years Experience In Plumbing
+            We Have 25 Years Experience In Plumbing & Construction
           </p>
         </div>
       </section>
@@ -151,7 +203,7 @@ export const Contact: React.FC<ContactProps> = ({
 
               <p className="max-w-[240px] text-xs font-bold uppercase leading-6 text-white/70">
                 Get <span className="text-[#D9AE00]">$25 OFF</span> Any
-                Tankless Water Heater Installation
+                Interior Renovation Project
               </p>
 
               <button
@@ -159,7 +211,7 @@ export const Contact: React.FC<ContactProps> = ({
                 onClick={() =>
                   setFormData({
                     ...formData,
-                    serviceType: "Tankless Water Heaters ($25 Promo)",
+                    serviceType: "All Types of Renovation Work",
                   })
                 }
                 className="mt-4 border border-[#D9AE00] bg-transparent px-5 py-2.5 text-[10px] font-bold uppercase text-white hover:bg-[#D9AE00] hover:text-[#084928]"
@@ -190,7 +242,6 @@ export const Contact: React.FC<ContactProps> = ({
 
           {bookingConfirmation ? (
             <div className="border border-[#D9AE00] bg-[#062D1A] p-8 text-center">
-
               <CheckCircle2 className="mx-auto h-12 w-12 text-[#D9AE00]" />
 
               <p className="mt-4 text-xs font-bold uppercase tracking-widest text-[#D9AE00]">
@@ -211,13 +262,12 @@ export const Contact: React.FC<ContactProps> = ({
                 type="button"
                 onClick={() => {
                   setBookingConfirmation(null);
-
                   setFormData({
                     name: "",
                     email: "",
                     phone: "",
                     address: "",
-                    serviceType: "HandyMan Repairs",
+                    serviceType: "RESIDENTIAL",
                     preferredDate: "",
                     preferredTime: "Morning (8AM - 12PM)",
                     urgency: "routine",
@@ -323,32 +373,65 @@ export const Contact: React.FC<ContactProps> = ({
               {/* SERVICE / DATE / URGENCY */}
               <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
 
-                {/* SERVICE */}
-                <div>
+                {/* CUSTOM GROUPED SERVICE DROPDOWN */}
+                <div className="relative" ref={dropdownRef}>
                   <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/70">
-                    Service Required
+                    Service Required *
                   </label>
 
-                  <select
-                    value={formData.serviceType}
-                    onChange={(event) =>
-                      setFormData({
-                        ...formData,
-                        serviceType: event.target.value,
-                      })
-                    }
-                    className="w-full border border-white/10 bg-[#084928] px-3 py-3 text-xs text-white outline-none focus:border-[#D9AE00]"
+                  <button
+                    type="button"
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className="flex w-full items-center justify-between border border-white/10 bg-[#084928] px-4 py-3 text-left text-xs text-white outline-none focus:border-[#D9AE00]"
                   >
-                    <option>HandyMan Repairs</option>
-                    <option>Drain Cleaning</option>
-                    <option>Gas Lines & Heating</option>
-                    <option>Sewer Lines</option>
-                    <option>Water Damage Prevention</option>
-                    <option>Tankless Water Heaters</option>
-                    <option>HandyMan Inspections</option>
-                    <option>Emergency Service Callout</option>
-                    <option>Tankless Water Heaters ($25 Promo)</option>
-                  </select>
+                    <span className="truncate pr-2">
+                      {formData.serviceType || "Select a service..."}
+                    </span>
+                    <ChevronDown
+                      className={`h-4 w-4 shrink-0 text-[#D9AE00] transition-transform duration-200 ${
+                        isDropdownOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {isDropdownOpen && (
+                    <div className="absolute left-0 top-full z-50 mt-1 max-h-72 w-full overflow-y-auto border border-[#D9AE00]/40 bg-[#042012] p-2 shadow-2xl backdrop-blur-md">
+                      {SERVICE_GROUPS.map((group) => (
+                        <div key={group.category} className="mb-3 last:mb-0">
+                          {/* Group Heading */}
+                          <div className="sticky top-0 bg-[#042012] px-2 py-1 text-[10px] font-black uppercase tracking-widest text-[#D9AE00] border-b border-[#D9AE00]/20">
+                            {group.category}
+                          </div>
+
+                          {/* Sub Options */}
+                          <div className="mt-1 space-y-0.5">
+                            {group.services.map((service) => {
+                              const isSelected = formData.serviceType === service;
+                              return (
+                                <button
+                                  key={service}
+                                  type="button"
+                                  onClick={() => {
+                                    setFormData({ ...formData, serviceType: service });
+                                    setIsDropdownOpen(false);
+                                  }}
+                                  className={`flex w-full items-center justify-between px-3 py-2 text-left text-xs transition-colors ${
+                                    isSelected
+                                      ? "bg-[#D9AE00] font-bold text-[#084928]"
+                                      : "text-white/80 hover:bg-white/10 hover:text-white"
+                                  }`}
+                                >
+                                  <span>{service}</span>
+                                  {isSelected && <Check className="h-3.5 w-3.5 text-[#084928]" />}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* DATE */}
@@ -410,7 +493,7 @@ export const Contact: React.FC<ContactProps> = ({
 
                 <textarea
                   rows={5}
-                  placeholder="Provide any details about the leak, noises, appliance models, or specific plumbing requirements..."
+                  placeholder="Provide any details about the work, dimensions, material preferences, or specific requirements..."
                   value={formData.message}
                   onChange={(event) =>
                     setFormData({
@@ -449,7 +532,6 @@ export const Contact: React.FC<ContactProps> = ({
         className="relative z-10 overflow-hidden border-t border-white/10 bg-[#062D1A]"
       >
         <div className="relative h-[420px] w-full">
-
           <iframe
             title="HandyMan Melbourne Location"
             src="https://www.google.com/maps?q=121%20King%20St%2C%20Melbourne%20VIC%203000&output=embed"
@@ -460,15 +542,12 @@ export const Contact: React.FC<ContactProps> = ({
           />
 
           <div className="absolute left-5 top-5 z-10 w-[calc(100%-40px)] max-w-[360px] border border-[#D9AE00] bg-[#062D1A]/95 p-6 shadow-2xl backdrop-blur-sm sm:left-8 sm:top-8">
-
             <div className="flex items-start gap-4">
-
               <div className="flex h-11 w-11 shrink-0 items-center justify-center bg-[#D9AE00] text-[#084928]">
                 <MapPin className="h-5 w-5" />
               </div>
 
               <div className="min-w-0">
-
                 <p className="font-exo text-[10px] font-black uppercase tracking-[0.18em] text-[#D9AE00]">
                   Our Location
                 </p>
@@ -480,14 +559,11 @@ export const Contact: React.FC<ContactProps> = ({
                 <p className="mt-2 text-xs leading-6 text-white/70">
                   121 King St, Melbourne VIC 3000
                 </p>
-
               </div>
             </div>
 
             <div className="mt-5 border-t border-white/10 pt-4">
-
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-
                 <span className="flex items-center gap-2 text-xs font-bold uppercase text-[#D9AE00]">
                   <Clock className="h-4 w-4" />
                   Open 24/7
@@ -502,7 +578,6 @@ export const Contact: React.FC<ContactProps> = ({
                   Open in Google Maps
                   <ExternalLink className="h-3.5 w-3.5" />
                 </a>
-
               </div>
             </div>
           </div>
