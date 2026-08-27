@@ -421,7 +421,7 @@
 
 
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Wrench,
   Building2,
@@ -434,13 +434,13 @@ import {
   Hammer,
   Ruler,
   ShieldCheck,
-  ChevronRight,
   Clock,
   Award,
   Users,
   DollarSign,
   Phone,
 } from "lucide-react";
+
 import { NavSection } from "../types";
 
 /* ============================================================
@@ -552,7 +552,7 @@ const constructionServices: SubService[] = [
 ];
 
 /* ============================================================
-   INTERIOR SERVICES
+   INTERIOR WORK
    ============================================================ */
 
 const interiorServices: SubService[] = [
@@ -705,8 +705,8 @@ const otherServices: SubService[] = [
     description:
       "Professional tile installation services including marble, granite, ceramic and modern flooring solutions.",
     features: [
-      "Marble Laying",
-      "Granite Laying",
+      "Marble",
+      "Granite",
       "Ceramic Tiles",
       "Floor Tiles",
       "Wall Tiles",
@@ -739,9 +739,9 @@ const otherServices: SubService[] = [
     description:
       "Custom fabrication solutions using M.S, S.S and aluminium for residential and commercial requirements.",
     features: [
-      "M.S Fabrication",
-      "S.S Fabrication",
-      "Aluminium Fabrication",
+      "M.S",
+      "S.S",
+      "Aluminium",
       "Railings & Grills",
       "Custom Metal Structures",
     ],
@@ -771,10 +771,10 @@ const otherServices: SubService[] = [
     title: "Painting",
     icon: <Paintbrush className="h-5 w-5 shrink-0" />,
     description:
-      "Professional interior and exterior painting services with careful preparation and quality finishing.",
+      "Professional painting services for both interior and exterior spaces with careful preparation and quality finishing.",
     features: [
-      "Interior Painting",
-      "Exterior Painting",
+      "Interior",
+      "Exterior",
       "Wall Preparation",
       "Texture Painting",
       "Repainting & Maintenance",
@@ -795,18 +795,21 @@ const whyChooseReasons = [
     desc: "Professional support whenever you need reliable service.",
     icon: <Clock className="h-7 w-7" />,
   },
+
   {
     num: "02",
     title: "Experienced Team",
     desc: "Skilled professionals with practical project experience.",
     icon: <Award className="h-7 w-7" />,
   },
+
   {
     num: "03",
     title: "Quality Work",
     desc: "We focus on quality materials and professional workmanship.",
     icon: <Users className="h-7 w-7" />,
   },
+
   {
     num: "04",
     title: "Affordable Pricing",
@@ -816,12 +819,16 @@ const whyChooseReasons = [
 ];
 
 /* ============================================================
-   COMPONENT
+   MAIN COMPONENT
    ============================================================ */
 
 export const Services: React.FC<ServicesProps> = ({
   onRequestQuote,
 }) => {
+  /* ==========================================================
+     STATE
+     ========================================================== */
+
   const [activeCategory, setActiveCategory] =
     useState<Category>("construction");
 
@@ -829,84 +836,111 @@ export const Services: React.FC<ServicesProps> = ({
     useState<string>("residential");
 
   /*
-   * This key is intentionally incremented every time the user
-   * changes category or sub-service.
-   *
-   * It forces the content and image elements to re-mount,
-   * allowing the slide animation to run every time.
+   * Every change increments this.
+   * It causes the arrow/content/image to remount,
+   * which restarts their animations.
    */
-  const [animKey, setAnimKey] = useState(0);
+  const [animationKey, setAnimationKey] = useState(0);
 
-  /* ============================================================
-     CATEGORY CHANGE
-     ============================================================ */
+  /*
+   * This ref is used to scroll to the Welcome section
+   * after the user clicks any top category image.
+   */
+  const welcomeSectionRef = useRef<HTMLDivElement | null>(null);
+
+  /* ==========================================================
+     SCROLL TO WELCOME
+     ========================================================== */
+
+  const scrollToWelcome = () => {
+    /*
+     * Small timeout allows React to render the selected
+     * category before scrolling.
+     */
+    window.setTimeout(() => {
+      welcomeSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 40);
+  };
+
+  /* ==========================================================
+     CATEGORY CLICK
+     ========================================================== */
 
   const handleCategoryClick = (category: Category) => {
-    let nextSubService = activeSubService;
+    let firstSubService = activeSubService;
 
     if (category === "construction") {
-      nextSubService = "residential";
+      firstSubService = "residential";
     }
 
     if (category === "interior") {
-      nextSubService = "kitchen";
+      firstSubService = "kitchen";
     }
 
     if (category === "other") {
-      nextSubService = "electrical";
+      firstSubService = "electrical";
     }
 
     setActiveCategory(category);
-    setActiveSubService(nextSubService);
-    setAnimKey((prev) => prev + 1);
+    setActiveSubService(firstSubService);
+
+    /*
+     * Restart animation.
+     */
+    setAnimationKey((previous) => previous + 1);
+
+    /*
+     * Required behavior:
+     * clicking the image/category automatically moves
+     * down to Welcome to Our Handyman.
+     */
+    scrollToWelcome();
   };
 
-  /* ============================================================
-     SUB SERVICE CHANGE
-     ============================================================ */
+  /* ==========================================================
+     SUB SERVICE CLICK
+     ========================================================== */
 
-  const handleSubServiceClick = (id: string) => {
-    if (id === activeSubService) {
-      /*
-       * Even when the user clicks the already-selected item,
-       * restart the animation.
-       */
-      setAnimKey((prev) => prev + 1);
-      return;
-    }
+  const handleSubServiceClick = (serviceId: string) => {
+    setActiveSubService(serviceId);
 
-    setActiveSubService(id);
-    setAnimKey((prev) => prev + 1);
+    /*
+     * Restart arrow, middle content and right image animation.
+     */
+    setAnimationKey((previous) => previous + 1);
   };
 
-  /* ============================================================
+  /* ==========================================================
      GET SUB SERVICES
-     ============================================================ */
+     ========================================================== */
 
   const getSubServices = (): SubService[] => {
-    switch (activeCategory) {
-      case "construction":
-        return constructionServices;
-
-      case "interior":
-        return interiorServices;
-
-      case "other":
-        return otherServices;
-
-      default:
-        return [];
+    if (activeCategory === "construction") {
+      return constructionServices;
     }
+
+    if (activeCategory === "interior") {
+      return interiorServices;
+    }
+
+    if (activeCategory === "other") {
+      return otherServices;
+    }
+
+    return [];
   };
 
-  /* ============================================================
-     GET CURRENT SERVICE
-     ============================================================ */
+  /* ==========================================================
+     GET CURRENT SUB SERVICE
+     ========================================================== */
 
   const getCurrentSubService = (): SubService | null => {
     const services = getSubServices();
 
-    if (!services.length) {
+    if (services.length === 0) {
       return null;
     }
 
@@ -919,9 +953,9 @@ export const Services: React.FC<ServicesProps> = ({
 
   const currentSubService = getCurrentSubService();
 
-  /* ============================================================
-     MAIN CATEGORY CARD
-     ============================================================ */
+  /* ==========================================================
+     CATEGORY CARD
+     ========================================================== */
 
   const CategoryCard = ({
     category,
@@ -932,17 +966,18 @@ export const Services: React.FC<ServicesProps> = ({
     title: string;
     image: string;
   }) => {
-    const selected = activeCategory === category;
+    const isActive = activeCategory === category;
 
     return (
       <button
         type="button"
         onClick={() => handleCategoryClick(category)}
-        aria-pressed={selected}
-        className={`group relative h-[205px] overflow-hidden text-left outline-none transition-all duration-300 focus-visible:ring-2 focus-visible:ring-[#D9AE00] ${
-          selected ? "ring-2 ring-[#D9AE00]" : ""
+        aria-pressed={isActive}
+        className={`group relative h-[205px] w-full overflow-hidden text-left outline-none transition-all duration-300 focus-visible:ring-2 focus-visible:ring-[#D9AE00] ${
+          isActive ? "ring-2 ring-[#D9AE00]" : ""
         }`}
       >
+        {/* IMAGE */}
         <img
           src={image}
           alt={title}
@@ -950,15 +985,17 @@ export const Services: React.FC<ServicesProps> = ({
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
 
+        {/* OVERLAY */}
         <div
-          className={`absolute inset-0 bg-gradient-to-b from-[#084928]/95 via-[#084928]/60 to-[#084928]/30 transition-transform duration-300 ${
-            selected
+          className={`absolute inset-0 bg-gradient-to-b from-[#084928]/95 via-[#084928]/65 to-[#084928]/30 transition-transform duration-300 ${
+            isActive
               ? "translate-y-0"
               : "translate-y-full group-hover:translate-y-0"
           }`}
         />
 
-        <div className="absolute inset-x-0 bottom-7 z-10 text-center">
+        {/* TITLE */}
+        <div className="absolute bottom-7 left-0 right-0 z-10 text-center">
           <h3 className="px-2 text-lg font-black uppercase text-white">
             {title}
           </h3>
@@ -966,6 +1003,10 @@ export const Services: React.FC<ServicesProps> = ({
       </button>
     );
   };
+
+  /* ==========================================================
+     RENDER
+     ========================================================== */
 
   return (
     <section
@@ -978,13 +1019,12 @@ export const Services: React.FC<ServicesProps> = ({
 
       <style>{`
         /*
-         * Main content animation.
-         * Used for the middle text and category content.
+         * Middle content enters from RIGHT.
          */
-        @keyframes serviceSlideFromRight {
+        @keyframes serviceContentFromRight {
           0% {
             opacity: 0;
-            transform: translate3d(80px, 0, 0);
+            transform: translate3d(90px, 0, 0);
           }
 
           100% {
@@ -994,26 +1034,28 @@ export const Services: React.FC<ServicesProps> = ({
         }
 
         /*
-         * Image comes from the right.
+         * Right image enters from RIGHT.
          */
         @keyframes serviceImageFromRight {
           0% {
             opacity: 0;
-            transform: translate3d(110px, 0, 0) scale(0.96);
+            transform: translate3d(120px, 0, 0);
           }
 
           100% {
             opacity: 1;
-            transform: translate3d(0, 0, 0) scale(1);
+            transform: translate3d(0, 0, 0);
           }
         }
 
         /*
-         * Existing-style arrow animation:
-         * arrow travels from the left viewport into its
-         * selected button position.
+         * YOUR RIGHT ARROW:
+         *
+         * The supplied right-arrow1.png travels from
+         * the LEFT side of the viewport into the selected
+         * service button.
          */
-        @keyframes arrowSlideFromLeftViewport {
+        @keyframes serviceArrowFromLeft {
           0% {
             opacity: 0;
             transform: translate3d(-100vw, 0, 0);
@@ -1029,61 +1071,44 @@ export const Services: React.FC<ServicesProps> = ({
           }
         }
 
-        @keyframes serviceFadeUp {
-          0% {
-            opacity: 0;
-            transform: translate3d(0, 20px, 0);
-          }
-
-          100% {
-            opacity: 1;
-            transform: translate3d(0, 0, 0);
-          }
-        }
+        /*
+         * IMPORTANT:
+         * Welcome to Our Handyman has NO animation.
+         *
+         * Only service content/image/arrow animate.
+         */
 
         .service-content-slide {
           animation:
-            serviceSlideFromRight
+            serviceContentFromRight
             0.75s
             cubic-bezier(0.16, 1, 0.3, 1)
             forwards;
         }
 
         .service-image-slide {
+          opacity: 0;
           animation:
             serviceImageFromRight
             0.85s
             cubic-bezier(0.16, 1, 0.3, 1)
             0.12s
             forwards;
-          opacity: 0;
         }
 
         .service-arrow-slide {
+          opacity: 0;
           animation:
-            arrowSlideFromLeftViewport
+            serviceArrowFromLeft
             0.8s
             cubic-bezier(0.16, 1, 0.3, 1)
             forwards;
-          opacity: 0;
         }
 
-        .service-fade-up {
-          animation:
-            serviceFadeUp
-            0.7s
-            cubic-bezier(0.16, 1, 0.3, 1)
-            forwards;
-        }
-
-        /*
-         * Respect reduced-motion preferences.
-         */
         @media (prefers-reduced-motion: reduce) {
           .service-content-slide,
           .service-image-slide,
-          .service-arrow-slide,
-          .service-fade-up {
+          .service-arrow-slide {
             animation: none !important;
             opacity: 1 !important;
             transform: none !important;
@@ -1118,12 +1143,11 @@ export const Services: React.FC<ServicesProps> = ({
       </div>
 
       {/* ======================================================
-          FIVE MAIN SERVICE IMAGE BUTTONS
+          FIVE IMAGE CATEGORY BUTTONS
           ====================================================== */}
 
       <div className="bg-[#084928] py-10 sm:py-14">
         <div className="mx-auto max-w-[1180px] px-5 sm:px-8">
-
           <div className="grid grid-cols-1 gap-6 md:grid-cols-5">
 
             <CategoryCard
@@ -1157,16 +1181,27 @@ export const Services: React.FC<ServicesProps> = ({
             />
 
           </div>
-
         </div>
       </div>
 
       {/* ======================================================
-          WELCOME TO OUR HANDYMAN
+          WELCOME SECTION
+          
+          NO ANIMATION.
+          NO BLINK.
+          STATIC HEADING.
           ====================================================== */}
 
-      <div className="bg-[#084928] py-12 sm:py-16">
+      <div
+        ref={welcomeSectionRef}
+        id="welcome-to-our-handyman"
+        className="scroll-mt-24 bg-[#084928] py-12 sm:py-16"
+      >
         <div className="mx-auto max-w-[1180px] px-5 sm:px-8">
+
+          {/* ==================================================
+              STATIC WELCOME TITLE
+              ================================================== */}
 
           <div className="mb-9 border-l-[5px] border-[#D9AE00] pl-4">
             <h2 className="text-xl font-black uppercase text-white sm:text-2xl">
@@ -1176,17 +1211,23 @@ export const Services: React.FC<ServicesProps> = ({
 
           {/* ==================================================
               RENOVATION
-              LEFT CONTENT + RIGHT IMAGE
+              
+              TWO COLUMN:
+              LEFT CONTENT
+              RIGHT IMAGE
               ================================================== */}
 
           {activeCategory === "renovation" && (
             <div
-              key={`renovation-${animKey}`}
-              className="service-content-slide grid grid-cols-1 items-center gap-10 md:grid-cols-2"
+              key={`renovation-${animationKey}`}
+              className="grid grid-cols-1 items-center gap-10 md:grid-cols-2"
             >
-              {/* LEFT */}
-              <div className="min-w-0">
+              {/* LEFT CONTENT */}
 
+              <div
+                key={`renovation-content-${animationKey}`}
+                className="service-content-slide min-w-0"
+              >
                 <h3 className="text-2xl font-black uppercase tracking-wide text-white">
                   Renovation Services
                 </h3>
@@ -1222,8 +1263,8 @@ export const Services: React.FC<ServicesProps> = ({
                     <strong className="text-[#D9AE00]">
                       Flooring & Tiling Upgrades:
                     </strong>{" "}
-                    Removal and fresh installation of marble, granite,
-                    ceramic, or modern tiling.
+                    Removal and fresh installation of marble,
+                    granite, ceramic, or modern tiling.
                   </p>
 
                   <p>
@@ -1239,9 +1280,9 @@ export const Services: React.FC<ServicesProps> = ({
                     <strong className="text-[#D9AE00]">
                       Custom Woodwork & Storage Integration:
                     </strong>{" "}
-                    Full refurbishment or new builds for modern kitchen
-                    setups, wardrobes, loft storage, TV units, wall
-                    units, and custom Pooja cabinets.
+                    Full refurbishment or new builds for modern
+                    kitchen setups, wardrobes, loft storage, TV
+                    units, wall units, and custom Pooja cabinets.
                   </p>
 
                   <p>
@@ -1249,7 +1290,8 @@ export const Services: React.FC<ServicesProps> = ({
                       Metalwork & Fabrication Refits:
                     </strong>{" "}
                     Upgrades involving M.S (mild steel), S.S
-                    (stainless steel), and aluminum fixtures or frames.
+                    (stainless steel), and aluminum fixtures or
+                    frames.
                   </p>
 
                 </div>
@@ -1263,12 +1305,12 @@ export const Services: React.FC<ServicesProps> = ({
                 >
                   Learn More
                 </button>
-
               </div>
 
               {/* RIGHT IMAGE */}
+
               <div
-                key={`renovation-image-${animKey}`}
+                key={`renovation-image-${animationKey}`}
                 className="flex justify-center md:justify-end"
               >
                 <img
@@ -1283,25 +1325,32 @@ export const Services: React.FC<ServicesProps> = ({
 
           {/* ==================================================
               WATER PROOFING
-              LEFT CONTENT + RIGHT IMAGE
+              
+              TWO COLUMN:
+              LEFT CONTENT
+              RIGHT IMAGE
               ================================================== */}
 
           {activeCategory === "waterproofing" && (
             <div
-              key={`waterproofing-${animKey}`}
-              className="service-content-slide grid grid-cols-1 items-center gap-10 md:grid-cols-2"
+              key={`waterproofing-${animationKey}`}
+              className="grid grid-cols-1 items-center gap-10 md:grid-cols-2"
             >
-              {/* LEFT */}
-              <div className="min-w-0">
+              {/* LEFT CONTENT */}
 
+              <div
+                key={`waterproofing-content-${animationKey}`}
+                className="service-content-slide min-w-0"
+              >
                 <h3 className="text-2xl font-black uppercase tracking-wide text-white">
                   Water Proofing Services
                 </h3>
 
                 <p className="mt-4 text-sm leading-7 text-white/90">
-                  We provide complete waterproofing solutions to protect
-                  residential, commercial and industrial properties from
-                  water leakage, seepage and moisture damage.
+                  We provide complete waterproofing solutions to
+                  protect residential, commercial and industrial
+                  properties from water leakage, seepage and
+                  moisture damage.
                 </p>
 
                 <ul className="mt-6 space-y-3">
@@ -1351,12 +1400,12 @@ export const Services: React.FC<ServicesProps> = ({
                 >
                   Learn More
                 </button>
-
               </div>
 
               {/* RIGHT IMAGE */}
+
               <div
-                key={`waterproofing-image-${animKey}`}
+                key={`waterproofing-image-${animationKey}`}
                 className="flex justify-center md:justify-end"
               >
                 <img
@@ -1366,79 +1415,81 @@ export const Services: React.FC<ServicesProps> = ({
                   className="service-image-slide h-[420px] w-full max-w-[500px] object-cover"
                 />
               </div>
-
             </div>
           )}
 
           {/* ==================================================
               CONSTRUCTION / INTERIOR / OTHER
-              THREE COLUMN DESIGN
+              
+              THREE COLUMNS:
+              LEFT  = SERVICE BUTTONS
+              MIDDLE = CONTENT
+              RIGHT = IMAGE
               ================================================== */}
 
           {(activeCategory === "construction" ||
             activeCategory === "interior" ||
             activeCategory === "other") && (
             <div
-              key={`${activeCategory}-${animKey}`}
+              key={`${activeCategory}-${animationKey}`}
               className="grid grid-cols-1 items-start gap-8 md:grid-cols-[250px_1fr_310px] lg:grid-cols-[270px_1fr_340px]"
             >
-
               {/* ==================================================
-                  LEFT SERVICE BUTTONS
+                  LEFT SERVICE MENU
                   ================================================== */}
 
-              <div
-                key={`service-menu-${activeCategory}`}
-                className="service-fade-up border border-white/10 bg-[#062D1A] shadow-xl"
-              >
+              <div className="border border-white/10 bg-[#062D1A] shadow-xl">
 
                 {getSubServices().map((service) => {
-                  const selected =
+                  const isSelected =
                     service.id === activeSubService;
 
                   return (
                     <button
-                      key={service.id}
+                      key={`${service.id}-${animationKey}`}
                       type="button"
                       onClick={() =>
                         handleSubServiceClick(service.id)
                       }
-                      aria-pressed={selected}
-                      className={`group relative flex min-h-[48px] w-full items-center justify-between px-4 text-left text-[11px] font-bold uppercase outline-none transition-all duration-200 focus-visible:ring-2 focus-visible:ring-[#D9AE00] ${
-                        selected
+                      aria-pressed={isSelected}
+                      className={`group relative flex min-h-[50px] w-full items-center justify-between px-4 text-left text-[11px] font-bold uppercase outline-none transition-all duration-200 focus-visible:ring-2 focus-visible:ring-[#D9AE00] ${
+                        isSelected
                           ? "border-2 border-[#E3FC03] bg-[#D9AE00] text-[#084928] shadow-[0_4px_14px_rgba(167,111,19,0.35)]"
                           : "border-b border-white/10 text-white/85 hover:bg-white/5 hover:text-white"
                       }`}
                     >
+                      {/* SERVICE NAME */}
 
-                      <span className="relative z-10 flex items-center gap-2">
-
+                      <span className="relative z-10 flex min-w-0 items-center gap-2">
                         {service.icon}
 
-                        <span>
+                        <span className="truncate">
                           {service.title}
                         </span>
-
                       </span>
 
                       {/* ==================================================
+                          YOUR SUPPLIED RIGHT ARROW IMAGE
+
                           IMPORTANT:
-                          THIS IS THE ORIGINAL-STYLE RIGHT ARROW ANIMATION.
-                          IT RESTARTS EVERY TIME animKey CHANGES.
+                          Put right-arrow1(1).png into:
+
+                          public/right-arrow1.png
                           ================================================== */}
 
-                      {selected && (
+                      {isSelected && (
                         <span
-                          key={`arrow-${activeCategory}-${service.id}-${animKey}`}
-                          className="service-arrow-slide relative z-10 flex shrink-0 items-center"
+                          key={`arrow-${activeCategory}-${service.id}-${animationKey}`}
+                          className="service-arrow-slide relative z-10 ml-3 flex h-7 w-9 shrink-0 items-center justify-center overflow-visible"
                         >
-                          <ChevronRight
-                            className="h-6 w-6"
-                            strokeWidth={2.5}
+                          <img
+                            src="/right-arrow1.png"
+                            alt=""
+                            aria-hidden="true"
+                            className="block h-7 w-9 object-contain"
                           />
                         </span>
                       )}
-
                     </button>
                   );
                 })}
@@ -1447,15 +1498,16 @@ export const Services: React.FC<ServicesProps> = ({
 
               {/* ==================================================
                   MIDDLE CONTENT
-                  SLIDES FROM RIGHT
+
+                  THIS SLIDES FROM RIGHT
+                  EVERY TIME USER CLICKS A SERVICE.
                   ================================================== */}
 
               {currentSubService && (
                 <div
-                  key={`content-${activeCategory}-${activeSubService}-${animKey}`}
+                  key={`middle-${activeCategory}-${activeSubService}-${animationKey}`}
                   className="service-content-slide min-w-0"
                 >
-
                   <h3 className="text-xl font-black uppercase tracking-wide text-white sm:text-2xl">
                     {currentSubService.title}
                   </h3>
@@ -1469,7 +1521,7 @@ export const Services: React.FC<ServicesProps> = ({
                     {currentSubService.features.map(
                       (feature, index) => (
                         <li
-                          key={`${currentSubService.id}-${index}`}
+                          key={`${currentSubService.id}-${feature}-${index}`}
                           className="flex items-start gap-3 text-sm font-medium text-white"
                         >
                           <span className="mt-[3px] text-[#D9AE00]">
@@ -1494,22 +1546,22 @@ export const Services: React.FC<ServicesProps> = ({
                   >
                     Learn More
                   </button>
-
                 </div>
               )}
 
               {/* ==================================================
                   RIGHT IMAGE
-                  SLIDES FROM RIGHT
+
+                  THIS SLIDES FROM RIGHT
+                  EVERY TIME USER CLICKS A SERVICE.
                   ================================================== */}
 
               {currentSubService && (
                 <div
-                  key={`image-container-${activeCategory}-${activeSubService}-${animKey}`}
+                  key={`right-image-${activeCategory}-${activeSubService}-${animationKey}`}
                   className="flex justify-center md:justify-end"
                 >
                   <img
-                    key={`image-${activeCategory}-${activeSubService}-${animKey}`}
                     src={currentSubService.image}
                     alt={currentSubService.title}
                     loading="lazy"
@@ -1529,32 +1581,26 @@ export const Services: React.FC<ServicesProps> = ({
           ====================================================== */}
 
       <div className="bg-[#084928] py-12 sm:py-16">
-
         <div className="mx-auto max-w-[1180px] px-5 sm:px-8">
 
           <div className="mb-9 border-l-[5px] border-[#D9AE00] pl-4">
-
             <h2 className="text-xl font-black uppercase text-white sm:text-2xl">
               Why Choose Us
             </h2>
-
           </div>
 
           <div className="grid grid-cols-1 gap-x-12 gap-y-8 md:grid-cols-2">
 
             {whyChooseReasons.map((reason) => (
-
               <div
                 key={reason.num}
                 className="flex min-h-[115px] items-start gap-5 border-b border-white/10 pb-7"
               >
-
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center text-[#D9AE00]">
                   {reason.icon}
                 </div>
 
                 <div>
-
                   <h3 className="text-base font-black uppercase text-white">
                     {reason.title}
                   </h3>
@@ -1562,17 +1608,13 @@ export const Services: React.FC<ServicesProps> = ({
                   <p className="mt-3 text-xs leading-6 text-white/75">
                     {reason.desc}
                   </p>
-
                 </div>
-
               </div>
-
             ))}
 
           </div>
 
         </div>
-
       </div>
 
       {/* ======================================================
@@ -1585,7 +1627,6 @@ export const Services: React.FC<ServicesProps> = ({
           backgroundColor: "#084928",
         }}
       >
-
         <div
           className="absolute inset-0 z-0 bg-repeat"
           style={{
@@ -1615,15 +1656,12 @@ export const Services: React.FC<ServicesProps> = ({
             onClick={() => onRequestQuote()}
             className="mt-5 inline-flex items-center gap-2 border border-[#D9AE00] bg-[#D9AE00] px-7 py-3 text-xs font-bold uppercase text-[#084928] shadow-md transition-colors hover:bg-[#084928] hover:text-[#D9AE00]"
           >
-
             Request Service
 
             <Phone className="h-4 w-4" />
-
           </button>
 
         </div>
-
       </div>
 
     </section>
